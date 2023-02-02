@@ -59,6 +59,9 @@ public class vidPlayer : MonoBehaviour
         // Load all video files from the Resources/videoPath (defined in Inspector) folder
         videos.AddRange(loadVideos(videoPath));
 
+        // Check that the fadeDuration is less than half as long as the shortest video
+        videos.FindAll(x => ((VideoClip)x).length < fadeDuration * 2.5f).ForEach(x => Debug.LogError("The fadeDuration is longer than half the length of the video " + x.name + ". This will cause flickering and can break the application."));
+
         // Create VideoPlayers
         playerA = gameObject.AddComponent<VideoPlayer>();
         playerB = gameObject.AddComponent<VideoPlayer>();
@@ -103,13 +106,13 @@ public class vidPlayer : MonoBehaviour
         {
             faded = false;
             playNextVideo(playerB);
-            StartCoroutine(fadeVideo(vidLayerA, vidLayerB));
+            StartCoroutine(fadeVideo(vidLayerA, vidLayerB, 1f / playerA.frameRate));
         }
         else if (faded && playerB.isPlaying && playerB.frame >= (int)playerB.frameCount - fadeDurationFrames)
         {
             faded = false;
             playNextVideo(playerA);
-            StartCoroutine(fadeVideo(vidLayerB, vidLayerA));
+            StartCoroutine(fadeVideo(vidLayerB, vidLayerA, 1f / playerA.frameRate));
         }
     }
 
@@ -145,22 +148,22 @@ public class vidPlayer : MonoBehaviour
     }
 
     // Coroutine to fade between two videos
-    IEnumerator fadeVideo(GameObject vidLayerA, GameObject vidLayerB)
+    IEnumerator fadeVideo(GameObject layerA, GameObject layerB, float frameDuration)
     {
         // set the inital alpha values of the video layers
-        vidLayerA.GetComponent<CanvasGroup>().alpha = 1;
-        vidLayerB.GetComponent<CanvasGroup>().alpha = 1;
+        layerA.GetComponent<CanvasGroup>().alpha = 1;
+        layerB.GetComponent<CanvasGroup>().alpha = 0;
 
         // fade the video layer in
         for (int i = 0; i < fadeDurationFrames; i++)
         {
-            vidLayerA.GetComponent<CanvasGroup>().alpha = 1 - fadeCurve.Evaluate((float)i / fadeDurationFrames);
-            vidLayerB.GetComponent<CanvasGroup>().alpha = fadeCurve.Evaluate((float)i / fadeDurationFrames);
-            yield return null;
+            layerA.GetComponent<CanvasGroup>().alpha = 1 - fadeCurve.Evaluate((float)i / fadeDurationFrames);
+            layerB.GetComponent<CanvasGroup>().alpha = fadeCurve.Evaluate((float)i / fadeDurationFrames);
+            yield return new WaitForSeconds(frameDuration);
         }
 
         // set the final alpha values of the video layers
-        vidLayerA.GetComponent<CanvasGroup>().alpha = 0;
-        vidLayerB.GetComponent<CanvasGroup>().alpha = 1;
+        layerA.GetComponent<CanvasGroup>().alpha = 0;
+        layerB.GetComponent<CanvasGroup>().alpha = 1;
     }
 }

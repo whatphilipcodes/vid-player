@@ -72,4 +72,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # dont upload videos into github repo
-/[Aa]ssets/[Rr]esources/[Vv]ideos/
+/[Aa]ssets/[Rr]esources/
