@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.UI;
-public class vidPlayer : MonoBehaviour
+public class VideoManager : MonoBehaviour
 {
     // Bitdepth option to select the bitdepth of the input video
     // Detail: The bitdepth controlls the amount of colors the RenderTextures used to display the videos can display
